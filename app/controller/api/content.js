@@ -500,7 +500,7 @@ let ContentController = {
             }), {
                 query: queryObj,
                 include: populateArr,
-                attributes: ['stitle', 'sImg', 'title', 'createdAt', 'updatedAt']
+                attributes: ['stitle', 'sImg', 'title', '_id', 'id', 'url', 'createdAt', 'updatedAt']
             })
 
             ctx.helper.renderSuccess(ctx, {
@@ -537,7 +537,7 @@ let ContentController = {
             // 查询自己的文章不需要约束状态
             if (!_.isEmpty(userInfo) && userInfo.id == userId) {
                 delete queryObj.state;
-                queryObj.uAuthor = userId;
+                queryObj.author_id = userId;
             }
 
             await ctx.service.content.inc(targetId, {
@@ -772,7 +772,7 @@ let ContentController = {
 
             let targetContent = await ctx.service.content.item({
                 query: {
-                    uAuthor: ctx.session.user.id
+                    author_id: ctx.session.user.id
                 }
             })
 
@@ -787,12 +787,12 @@ let ContentController = {
                 categories: fields.categories,
                 sortPath: fields.sortPath,
                 tags: fields.tags,
-                keywords: fields.keywords ? (fields.keywords).split(',') : [],
+                keywords: fields.keywords || '',
                 sImg: fields.sImg,
                 author: !_.isEmpty(ctx.session.adminUserInfo) ? ctx.session.adminUserInfo.id : '',
                 state: fields.state,
                 dismissReason: fields.dismissReason,
-                isTop: fields.isTop || '',
+                isTop: fields.isTop,
                 discription: xss(fields.discription),
                 comments: fields.comments,
                 simpleComments: xss(fields.simpleComments),
