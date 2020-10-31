@@ -463,7 +463,7 @@ let ContentController = {
                     draft: '1'
                 });
             } else {
-                await ctx.service.message.removes(targetIds, 'contentId');
+                await ctx.service.message.removes(targetIds, 'content_id');
                 await ctx.service.content.removes(targetIds);
             }
 
