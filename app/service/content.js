@@ -2,7 +2,7 @@
  * @Author: doramart 
  * @Date: 2019-06-24 13:20:49 
  * @Last Modified by: doramart
- * @Last Modified time: 2020-10-03 09:56:56
+ * @Last Modified time: 2020-10-04 22:07:16
  */
 
 'use strict';
@@ -46,9 +46,9 @@ class ContentService extends Service {
             // 评论数
             [this.app.Sequelize.literal(`(
             SELECT COUNT(*)
-            FROM doracms_user_message_content AS user_message_content
+            FROM doracms_message AS message
             WHERE
-            user_message_content.content_id = content.id
+            message.content_id = content.id
             )`), 'commentNum'],
             // 点赞总数
             [this.app.Sequelize.literal(`(
@@ -146,9 +146,9 @@ class ContentService extends Service {
             // 评论数
             [this.app.Sequelize.literal(`(
                 SELECT COUNT(*)
-                FROM doracms_user_message_content AS user_message_content
+                FROM doracms_message AS message
                 WHERE
-                user_message_content.content_id = content.id
+                message.content_id = content.id
                 )`), 'commentNum'],
             // 点赞总数
             [this.app.Sequelize.literal(`(

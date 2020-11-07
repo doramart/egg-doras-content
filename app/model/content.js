@@ -156,12 +156,12 @@ module.exports = app => {
             as: 'favorite'
         });
 
-        app.model.Content.belongsToMany(app.model.User, {
-            through: app.model.UserMessageContent,
-            foreignKey: 'content_id',
-            otherKey: 'user_id',
-            as: 'message'
-        });
+        // app.model.Content.belongsToMany(app.model.User, {
+        //     through: app.model.UserMessageContent,
+        //     foreignKey: 'content_id',
+        //     otherKey: 'user_id',
+        //     as: 'message'
+        // });
 
         app.model.Content.belongsToMany(app.model.User, {
             through: app.model.UserDespiseContent,

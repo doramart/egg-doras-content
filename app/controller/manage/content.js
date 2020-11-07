@@ -163,7 +163,7 @@ let ContentController = {
             const formObj = {
                 title: fields.title,
                 stitle: fields.stitle,
-                type: fields.type,
+                content_type: fields.type,
                 categories: fields.categories,
                 sortPath: fields.sortPath,
                 tags: newTagArr,
@@ -179,7 +179,6 @@ let ContentController = {
                 comments: fields.comments,
                 simpleComments: xss(fields.simpleComments),
                 likeUserIds: [],
-                type: fields.type
             }
 
 
@@ -328,7 +327,7 @@ let ContentController = {
             const formObj = {
                 title: fields.title,
                 stitle: fields.stitle,
-                type: fields.type,
+                content_type: fields.type,
                 categories: fields.categories,
                 sortPath: fields.sortPath,
                 tags: newTagArr,
@@ -343,7 +342,6 @@ let ContentController = {
                 discription: xss(fields.discription),
                 comments: fields.comments,
                 simpleComments: xss(fields.simpleComments),
-                type: fields.type
             }
 
             ctx.validate(contentRule(ctx), formObj);
@@ -463,7 +461,7 @@ let ContentController = {
                     draft: '1'
                 });
             } else {
-                await ctx.service.message.removes(targetIds, 'contentId');
+                await ctx.service.message.removes(targetIds, 'content_id');
                 await ctx.service.content.removes(targetIds);
             }
 
