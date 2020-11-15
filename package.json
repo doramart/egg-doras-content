@@ -1,6 +1,6 @@
 {
   "name": "egg-doras-content",
-  "version": "1.0.1",
+  "version": "1.0.7",
   "description": "content",
   "eggPlugin": {
     "name": "doraContent"
@@ -13,7 +13,6 @@
   "dependencies": {
     "stream-wormhole": "^1.1.0",
     "await-stream-ready": "^1.0.1",
-    
     "mammoth": "^1.4.9",
     "moment": "^2.24.0",
     "lodash": "^4.17.15",

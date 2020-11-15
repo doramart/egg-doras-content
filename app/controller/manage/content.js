@@ -163,7 +163,7 @@ let ContentController = {
             const formObj = {
                 title: fields.title,
                 stitle: fields.stitle,
-                type: fields.type,
+                content_type: fields.type,
                 categories: fields.categories,
                 sortPath: fields.sortPath,
                 tags: newTagArr,
@@ -179,7 +179,6 @@ let ContentController = {
                 comments: fields.comments,
                 simpleComments: xss(fields.simpleComments),
                 likeUserIds: [],
-                type: fields.type
             }
 
 
@@ -197,8 +196,10 @@ let ContentController = {
 
 
             // 如果是管理员代发,则指定用户
-            if (ctx.session.adminUserInfo && fields.targetUser) {
-                formObj.uAuthor = fields.targetUser;
+            if (ctx.session.adminUserInfo && ctx.session.adminUserInfo.editor_id) {
+                formObj.author_id = Number(ctx.session.adminUserInfo.editor_id);
+            } else {
+                throw new Error(ctx.__('validate_error_params'));
             }
 
             let newContent = await ctx.service.content.create(formObj);
@@ -303,7 +304,7 @@ let ContentController = {
             }
 
             await ctx.service.content.updateMany(targetIds, {
-                uAuthor: targetUser
+                author_id: targetUser
             })
 
             ctx.helper.renderSuccess(ctx);
@@ -328,7 +329,7 @@ let ContentController = {
             const formObj = {
                 title: fields.title,
                 stitle: fields.stitle,
-                type: fields.type,
+                content_type: fields.type,
                 categories: fields.categories,
                 sortPath: fields.sortPath,
                 tags: newTagArr,
@@ -343,7 +344,6 @@ let ContentController = {
                 discription: xss(fields.discription),
                 comments: fields.comments,
                 simpleComments: xss(fields.simpleComments),
-                type: fields.type
             }
 
             ctx.validate(contentRule(ctx), formObj);
@@ -361,8 +361,10 @@ let ContentController = {
             }
 
             // 如果是管理员代发,则指定用户
-            if (ctx.session.adminUserInfo && fields.targetUser) {
-                formObj.uAuthor = fields.targetUser;
+            if (ctx.session.adminUserInfo && ctx.session.adminUserInfo.editor_id) {
+                formObj.author_id = Number(ctx.session.adminUserInfo.editor_id);
+            } else {
+                throw new Error(ctx.__('validate_error_params'));
             }
 
             await ctx.service.content.update(fields.id, formObj);
@@ -389,7 +391,7 @@ let ContentController = {
 
             let fields = ctx.request.body || {};
             const formObj = {
-                targetEditor: fields.targetUser,
+                editor_id: fields.targetUser,
             }
 
             let oldUser = await ctx.service.user.item({
@@ -405,6 +407,8 @@ let ContentController = {
             let adminUserInfo = ctx.session.adminUserInfo;
 
             await ctx.service.adminUser.update(adminUserInfo.id, formObj);
+
+            ctx.session.adminUserInfo.editor_id = fields.targetUser;
 
             ctx.helper.renderSuccess(ctx);
 
@@ -463,7 +467,7 @@ let ContentController = {
                     draft: '1'
                 });
             } else {
-                await ctx.service.message.removes(targetIds, 'contentId');
+                await ctx.service.message.removes(targetIds, 'content_id');
                 await ctx.service.content.removes(targetIds);
             }
 

@@ -246,11 +246,11 @@ let ContentController = {
                 sortObj = [
                     ['click_num', 'desc']
                 ];
-                let rangeTime = getDateStr(-720);
-                queryObj.date = {
-                    [app.Sequelize.Op.gte]: new Date(rangeTime.startTime),
-                    [app.Sequelize.Op.lte]: new Date(rangeTime.endTime)
-                }
+                // let rangeTime = getDateStr(-720);
+                // queryObj.createdAt = {
+                //     [app.Sequelize.Op.gte]: new Date(rangeTime.startTime),
+                //     [app.Sequelize.Op.lte]: new Date(rangeTime.endTime)
+                // }
             }
 
             // 如果是本人，返回所有文档
@@ -500,7 +500,7 @@ let ContentController = {
             }), {
                 query: queryObj,
                 include: populateArr,
-                attributes: ['stitle', 'sImg', 'title', 'createdAt', 'updatedAt']
+                attributes: ['stitle', 'sImg', 'title', '_id', 'id', 'url', 'createdAt', 'updatedAt']
             })
 
             ctx.helper.renderSuccess(ctx, {
@@ -537,20 +537,21 @@ let ContentController = {
             // 查询自己的文章不需要约束状态
             if (!_.isEmpty(userInfo) && userInfo.id == userId) {
                 delete queryObj.state;
-                queryObj.uAuthor = userId;
+                queryObj.author_id = userId;
             }
-
-            await ctx.service.content.inc(targetId, {
-                'click_num': 1
-            })
 
             let targetContent = await ctx.service.content.item({
                 query: queryObj,
                 // attributes: getContentListFields()
             });
 
-            // let renderContent = Array(targetContent);
-            // renderContent = await this.renderContentList(ctx, userInfo.id, renderContent);
+            if (_.isEmpty(targetContent)) {
+                throw new Error(ctx.__('label_page_404'));
+            } else {
+                await ctx.service.content.inc(targetId, {
+                    'click_num': 1
+                })
+            }
 
             ctx.helper.renderSuccess(ctx, {
                 data: targetContent
@@ -597,7 +598,7 @@ let ContentController = {
                         [app.Sequelize.Op.lte]: new Date(targetContent.updatedAt)
                     }
                 },
-                attributes: ['title', '_id', 'id', 'createdAt', 'updatedAt', 'sImg', 'discription']
+                attributes: ['title', '_id', 'id', 'createdAt', 'updatedAt', 'sImg', 'discription', 'url']
             });
 
             let nextContent = await ctx.service.content.find({
@@ -616,7 +617,7 @@ let ContentController = {
                 sort: [
                     ['updated_at', 'desc']
                 ],
-                attributes: ['title', '_id', 'id', 'createdAt', 'updatedAt', 'sImg', 'discription']
+                attributes: ['title', '_id', 'id', 'createdAt', 'updatedAt', 'sImg', 'discription', 'url']
             });
 
             ctx.helper.renderSuccess(ctx, {
@@ -772,7 +773,7 @@ let ContentController = {
 
             let targetContent = await ctx.service.content.item({
                 query: {
-                    uAuthor: ctx.session.user.id
+                    author_id: ctx.session.user.id
                 }
             })
 
@@ -787,12 +788,12 @@ let ContentController = {
                 categories: fields.categories,
                 sortPath: fields.sortPath,
                 tags: fields.tags,
-                keywords: fields.keywords ? (fields.keywords).split(',') : [],
+                keywords: fields.keywords || '',
                 sImg: fields.sImg,
                 author: !_.isEmpty(ctx.session.adminUserInfo) ? ctx.session.adminUserInfo.id : '',
                 state: fields.state,
                 dismissReason: fields.dismissReason,
-                isTop: fields.isTop || '',
+                isTop: fields.isTop,
                 discription: xss(fields.discription),
                 comments: fields.comments,
                 simpleComments: xss(fields.simpleComments),
@@ -813,7 +814,7 @@ let ContentController = {
 
             contentObj.comments = xss(fields.comments);
             contentObj.stitle = contentObj.title;
-            contentObj.uAuthor = ctx.session.user.id;
+            contentObj.author_id = ctx.session.user.id;
 
             if (fields.draft == '1') {
                 contentObj.state = '0'
